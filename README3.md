@@ -24,3 +24,21 @@ network:
       addresses: [172.16.10.10/24]
   version: 2
 ```
+
+
+## instalasi docker
+```bash
+apt update -y && apt upgrade -y
+```
+enter
+```bash
+apt install docker.io -y
+```
+enter dan tunggu proses instalasinya
+```bash
+systemctl start docker
+```
+enter
+```bash
+systemctl enable docker
+```

@@ -1,4 +1,4 @@
-# Hari 2
+# Rangkuman 2
 
 ## Instalasi Docker Pada Node 2
 ```bash

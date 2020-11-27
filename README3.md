@@ -34,11 +34,22 @@ enter
 ```bash
 apt install docker.io -y
 ```
-enter dan tunggu proses instalasinya
+enter dan tunggu proses instalasinya,
+jalankan docker
 ```bash
 systemctl start docker
 ```
-enter
+enter, 
+aktifkan docker saat booting
 ```bash
 systemctl enable docker
+```
+cek status docker
+```bash
+systemctl status docker
+```
+
+### Ubah Hostname di Ubuntu (untuk Manager/Leader Swarm)
+```bash
+hostnamectl set-hostname Master
 ```

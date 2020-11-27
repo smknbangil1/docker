@@ -16,15 +16,10 @@ network:
   ethernets:
     enp0s3:
       dhcp4: true
-  version: 2
-
-network:
-  ethernets:
     enp0s8:
       addresses: [172.16.10.10/24]
   version: 2
 ```
-
 
 ## instalasi docker
 ```bash
@@ -52,4 +47,8 @@ systemctl status docker
 ### Ubah Hostname di Ubuntu (untuk Manager/Leader Swarm)
 ```bash
 hostnamectl set-hostname Master
+```
+### Ubah timezone WIB
+```bash
+timedatectl set-timezone Asia/Jakarta
 ```

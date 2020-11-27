@@ -21,6 +21,15 @@ network:
   version: 2
 ```
 
+### Ubah Hostname di Ubuntu (untuk Manager/Leader Swarm)
+```bash
+hostnamectl set-hostname Master
+```
+### Ubah timezone WIB
+```bash
+timedatectl set-timezone Asia/Jakarta
+```
+### ===================
 ## instalasi docker
 ```bash
 apt update -y && apt upgrade -y
@@ -43,16 +52,6 @@ cek status docker
 ```bash
 systemctl status docker
 ```
-
-### Ubah Hostname di Ubuntu (untuk Manager/Leader Swarm)
-```bash
-hostnamectl set-hostname Master
-```
-### Ubah timezone WIB
-```bash
-timedatectl set-timezone Asia/Jakarta
-```
-### ===================
 ## Pengenalan Docker Swarm
 
 ### Inisialisasi docker swarm pada node 1

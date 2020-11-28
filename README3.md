@@ -10,7 +10,7 @@ ifconfig -a
 ```bash
 nano /etc/netplan/00-installer-config.yaml
 ```
-### terus masukin syntax yaml sesuai kebutuhan dan topologi Anda
+### terus masukin syntax yaml sesuai kebutuhan dan topologi di sekolah
 contoh di jaringan saya, berikut ini
 ```bash
 network:

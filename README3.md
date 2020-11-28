@@ -1,4 +1,5 @@
-# Install Ubuntu + LAN + Docker Swarm
+# Install Ubuntu + Docker Swarm + Moodle
+# Di SMKN 1 Bangil
 
 ## periksa seluruh interface NIC
 ```bash
@@ -17,11 +18,11 @@ network:
     enp0s3:
       dhcp4: true
     enp0s8:
-      addresses: [172.16.10.10/24]
+      addresses: [172.16.10.11/24]
   version: 2
 ```
 
-### Ubah Hostname di Ubuntu (untuk Manager/Leader Swarm)
+### Ubah Hostname di Ubuntu
 ```bash
 hostnamectl set-hostname Master
 ```
@@ -52,7 +53,7 @@ cek status docker
 ```bash
 systemctl status docker
 ```
-## Pengenalan Docker Swarm
+## Docker Swarm
 
 ### Inisialisasi docker swarm pada node 1
 ```bash
@@ -70,35 +71,7 @@ root@node2:~# docker swarm join --token [join token] [ip private node1]:2377
 ```bash
 root@node1:~# docker node ls
 ```
-### Menjalankan container pada cluster swarm
-```bash
-root@node1:~# cd && mkdir latihan5
-root@node1:~# cd latihan5
-root@node1:~# nano docker-compose.yml
-```
-Isikan:
-```yaml
-version: '3.8'
-services:
-  web:
-    image: nginx
-    ports:
-      - "8080:80"
-    deploy:
-      replicas: 4
-```
-```bash
-root@node1:~# docker stack deploy --compose-file docker-compose.yml [nama stack]
-root@node1:~# docker stack ls
-root@node1:~# docker stack ps [nama stack]
-```
-### Menghapus stack dari docker swarm
-```bash
-root@node1:~# docker stack ls
-root@node1:~# docker stack rm [nama stack]
-```
-
-## Pengenalan Portainer
+## Install Portainer
 ### Download file Portainer
 ```bash
 cd && mkdir latihan6
@@ -115,13 +88,8 @@ Akses lewat browser menggunakan ip node1:9000
 Atur username dan password
 
 ## Studi Kasus Moodle dengan Docker Swarm
-### Buat file docker-compose.yml moodle
-```bash
-cd && mkdir latihan7
-cd latihan7
-nano docker-compose.yml
-```
-Isikan:
+### Saya masukkan script yaml dibawah ini ke Menu Portainer > Stack
+
 ```yaml
 version: '3.8'
 services:
@@ -157,11 +125,10 @@ volumes:
   moodledata_data:
     driver: local
 ```
-### Menjalankan stack moodle
-```bash
-docker stack deploy --compose-file docker-compose.yml moodle
-docker stack ls
-docker stack ps moodle
-docker stack services moodle
+#### klik tombol Deploy the stack
+#### ..tunggu sampai proses selesai
+#### lalu buka browser http://ip_node1
+
 ```
-Akses lewat browser dengan ip node1:80
+sampai disini moodle sudah bisa di akses tapi belum bisa menyimpan data, ketika saya restart server  node 1 sampai node 3 
+aplikasi moodle kembali seperti semula, kosong lagi datanya... padahal sebelum restart server saya sempat memasukkan beberapa akun siswa hilang setelah restart

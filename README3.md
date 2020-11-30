@@ -88,42 +88,105 @@ Akses lewat browser menggunakan ip node1:9000
 Atur username dan password
 
 ## Studi Kasus Moodle dengan Docker Swarm
-### Saya masukkan script yaml dibawah ini ke Menu Portainer > Stack
+### Instalasi dan konfigurasi GlusterFS
+Glusterfs akan digunakan sebagai volume persistent ketika menjalankan moodle di docker swarm, sehingga ketika moodle di deploy ulang,
+data yang sudah ada tidak akan hilang.
 
+Jalankan sebagai user root di semua node
+```bash
+add-apt-repository ppa:gluster/glusterfs-3.12
+```
+```bash
+apt install glusterfs-server -y
+```
+```bash
+systemctl start glusterd && systemctl enable glusterd
+```
+
+Generate ssh key baru untuk setiap node (masih dengan user root)
+```bash
+ssh-keygen -t rsa
+```
+
+Sebelum melakukan probing gluster node, pastikan IP address setiap node sudah di-mapping ke ```/etc/hosts```
+```bash
+nano /etc/hosts
+```
+sebagai contoh:
+```
+192.168.1.10 docker-node1
+192.168.1.20 docker-node2
+192.168.1.30 docker-node3
+```
+
+Setelah itu, lakukan peer probe pada node 1 atau node yang menjadi docker swarm manager
+```bash
+gluster peer probe docker-node2
+gluster peer probe docker-node3
+```
+Cek kembali peer pool gluster yang sudah ditambahkan
+```bash
+gluster pool list
+```
+
+Buat direktori baru di semua node
+```bash
+mkdir -p /gluster/moodle-volume
+```
+
+Kemudian buat volume glusterfs, lakukan hanya di node 1 atau node yang menjadi docker swarm manager
+```bash
+gluster volume create staging-gfs replica 3 docker-node1:/gluster/moodle-volume docker-node2:/gluster/moodle-volume docker-node3:/gluster/moodle-volume force
+```
+```replica``` disini mengikuti jumlah node yang ada di gluster pool, jika terdapat 3 pool maka replica = 3
+Jalankan volume glusterfs
+```bash
+gluster volume start staging-gfs
+```
+
+Selanjutnya, pastikan volume gluster yang sudah dibuat akan ter-mount otomatis ketika server restart, lakukan di semua node
+```bash
+echo 'localhost:/staging-gfs /mnt/moodle-volume glusterfs defaults,_netdev,backupvolfile-server=localhost 0 0' >> /etc/fstab
+```
+Mount volume glusterfs
+```bash
+mount.glusterfs localhost:/staging-gfs /mnt/moodle-volume
+```
+Ubah hak kepemilikan volume
+```bash
+chown -R root:docker /mnt/moodle-volume
+```
+
+Cek kembali apakah volume glusterfs sudah ter-mount
+```bash
+df -h | grep /mnt/moodle-volume
+```
+
+### Pada portainer, buka Menu Portainer > Stack dan masukkan konfigurasi docker compose berikut
 ```yaml
 version: '3.8'
 services:
-  mariadb:
-    image: 'docker.io/bitnami/mariadb:10.3-debian-10'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_USER=bn_moodle
-      - MARIADB_DATABASE=bitnami_moodle
-    volumes:
-      - 'mariadb_data:/bitnami/mariadb'
   moodle:
-    image: 'docker.io/bitnami/moodle:3-debian-10'
+    image: 'azemoning/moodle-redis'
     ports:
       - '80:8080'
       - '443:8443'
     environment:
-      - MOODLE_DATABASE_HOST=mariadb
+      - MOODLE_SKIP_INSTALL=yes
+      - MOODLE_DATABASE_HOST=mariadbhost
       - MOODLE_DATABASE_PORT_NUMBER=3306
-      - MOODLE_DATABASE_USER=bn_moodle
-      - MOODLE_DATABASE_NAME=bitnami_moodle
-      - ALLOW_EMPTY_PASSWORD=yes
+      - MOODLE_DATABASE_USER=dbuser
+      - MOODLE_DATABASE_NAME=dbname
+      - MOODLE_DATABASE_PASSWORD=mariadbpassword
+      - BITNAMI_DEBUG=true
+      - TZ=Asia/Jakarta
     volumes:
-      - 'moodle_data:/bitnami/moodle'
-      - 'moodledata_data:/bitnami/moodledata'
-    depends_on:
-      - mariadb
-volumes:
-  mariadb_data:
-    driver: local
-  moodle_data:
-    driver: local
-  moodledata_data:
-    driver: local
+      - type: bind
+        source: /mnt/moodle-volume/moodle
+        destination: /bitnami/moodle
+      - type: bind
+        source: /mnt/moodle-volume/moodledata
+        destination: /bitnami/moodledata
 ```
 #### klik tombol Deploy the stack
 #### ..tunggu sampai proses selesai

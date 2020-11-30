@@ -88,6 +88,11 @@ Akses lewat browser menggunakan ip node1:9000
 Atur username dan password
 
 ## Studi Kasus Moodle dengan Docker Swarm
+### Prasyarat
+Sebelum memulai, pastikan database yang digunakan sudah terkonfigurasi (non container)
+
+mariadb versi 10.3 ke atas
+redis versi terbaru
 ### Instalasi dan konfigurasi GlusterFS
 Glusterfs akan digunakan sebagai volume persistent ketika menjalankan moodle di docker swarm, sehingga ketika moodle di deploy ulang,
 data yang sudah ada tidak akan hilang.

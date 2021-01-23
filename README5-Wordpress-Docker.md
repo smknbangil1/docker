@@ -1,3 +1,4 @@
+~~~bash
 # version: '3.7'
 services:
   wordpress:
@@ -23,3 +24,4 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
       - ./db:/var/lib/mysql
+~~~
